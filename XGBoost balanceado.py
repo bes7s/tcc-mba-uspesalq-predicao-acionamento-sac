@@ -26,10 +26,8 @@ import numpy as np
 from xgboost import XGBClassifier
 
 from sklearn.metrics import (
-    accuracy_score,
     precision_score,
     recall_score,
-    f1_score,
     roc_auc_score,
     confusion_matrix,
     ConfusionMatrixDisplay,
@@ -174,10 +172,8 @@ plt.show()
 # =============================================================================
 
 print(f"Cutoff utilizado: {cutoff}")
-print(f"Acurácia: {accuracy:.4f}")
 print(f"Precisão: {precision:.4f}")
 print(f"Recall: {recall:.4f}")
-print(f"F1-Score: {f1:.4f}")
 print(f"AUC-ROC: {roc_auc:.4f}")
 
 
