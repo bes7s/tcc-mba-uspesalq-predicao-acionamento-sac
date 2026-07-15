@@ -136,11 +136,9 @@ df_SAC.to_excel('arquivo_dados.xlsx', index=False)
 
 from sklearn.metrics import (
     confusion_matrix,
-    accuracy_score,
     ConfusionMatrixDisplay,
     recall_score,
-    precision_score,
-    f1_score
+    precision_score
 )
 
 def matriz_confusao(predicts, observado, cutoff):
@@ -172,18 +170,12 @@ def matriz_confusao(predicts, observado, cutoff):
 
     # Cálculo dos indicadores
     sensitividade = recall_score(observado, predicao_binaria, pos_label=1)
-    especificidade = recall_score(observado, predicao_binaria, pos_label=0)
-    acuracia = accuracy_score(observado, predicao_binaria)
     precision = precision_score(observado, predicao_binaria, pos_label=1)
-    f1 = f1_score(observado, predicao_binaria, pos_label=1)
 
     # Organização dos resultados
     indicadores = pd.DataFrame({
         'Sensitividade': [sensitividade],
-        'Especificidade': [especificidade],
-        'Acurácia': [acuracia],
-        'Precision': [precision],
-        'F1-score': [f1]
+        'Precision': [precision]
     })
 
     return indicadores
@@ -204,98 +196,7 @@ matriz_confusao(
 
 # %%
 # =============================================================================
-# 11. ANÁLISE DOS CUTOFFS
-# =============================================================================
-
-# Tentativa de estabelecimento de um critério que iguale a probabilidade de
-# acerto daqueles que abrirão SAC (sensitividade) e a probabilidade de
-# acerto daqueles que não abrirão SAC (especificidade)
-
-def espec_sens(observado, predicts):
-
-    # Adicionar objeto com os valores dos predicts
-    values = predicts.values
-
-    # Range dos cutoffs a serem analisados em steps de 0.01
-    cutoffs = np.arange(0, 1.01, 0.01)
-
-    # Listas que receberão os resultados de especificidade e sensitividade
-    lista_sensitividade = []
-    lista_especificidade = []
-
-    for cutoff in cutoffs:
-
-        # Classificação binária de acordo com o predict
-        predicao_binaria = []
-
-        for item in values:
-            if item >= cutoff:
-                predicao_binaria.append(1)
-            else:
-                predicao_binaria.append(0)
-                
-        # Cálculo da sensitividade e especificidade no cutoff
-        sensitividade = recall_score(observado, predicao_binaria, pos_label=1)
-        especificidadee = recall_score(observado, predicao_binaria, pos_label=0)
-
-        lista_sensitividade.append(sensitividade)
-        lista_especificidade.append(especificidadee)
-
-    resultado = pd.DataFrame({
-        'cutoffs': cutoffs,
-        'sensitividade': lista_sensitividade,
-        'especificidade': lista_especificidade
-    })
-
-    return resultado
-
-# %%
-# =============================================================================
-# 12. CONSOLIDAÇÃO DOS INDICADORES DE SENSITIVIDADE E ESPECIFICIDADE
-# =============================================================================
-
-# Gerando dataframe
-dados_plotagem = espec_sens(
-    observado=df_SAC['target'],
-    predicts=df_SAC['phat']
-)
-
-dados_plotagem
-
-# %%
-# =============================================================================
-# 13. ANÁLISE DA SENSITIVIDADE E ESPECIFICIDADE EM FUNÇÃO DO CUTOFF
-# =============================================================================
-
-plt.figure(figsize=(15, 10))
-
-with plt.style.context('seaborn-v0_8-whitegrid'):
-    plt.plot(
-        dados_plotagem.cutoffs,
-        dados_plotagem.sensitividade,
-        marker='o',
-        color='indigo',
-        markersize=8
-    )
-
-    plt.plot(
-        dados_plotagem.cutoffs,
-        dados_plotagem.especificidade,
-        marker='o',
-        color='darkorange',
-        markersize=8
-    )
-
-plt.xlabel('Cuttoff', fontsize=20)
-plt.ylabel('Sensitividade / Especificidade', fontsize=20)
-plt.xticks(np.arange(0, 1.1, 0.2), fontsize=14)
-plt.yticks(np.arange(0, 1.1, 0.2), fontsize=14)
-plt.legend(['Sensitividade', 'Especificidade'], fontsize=20)
-plt.show()
-
-# %%
-# =============================================================================
-# 14. ANÁLISE DA CURVA ROC E CAPACIDADE DISCRIMINATÓRIA DO MODELO
+# 11. ANÁLISE DA CURVA ROC E CAPACIDADE DISCRIMINATÓRIA DO MODELO
 # =============================================================================
 
 from sklearn.metrics import roc_curve, auc
